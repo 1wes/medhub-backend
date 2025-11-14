@@ -1,0 +1,33 @@
+{
+  "name": "medhub-backend",
+  "version": "1.0.0",
+  "description": "Restful backend API for a mini EMR",
+  "main": "index.ts",
+  "scripts": {
+    "dev":"nodemon --exec ts-node src/index.ts",
+    "build":"tsc",
+    "start":"dist/index.js",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/1wes/medhub-backend.git"
+  },
+  "keywords": [
+    "EMR"
+  ],
+  "author": "Wes",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/1wes/medhub-backend/issues"
+  },
+  "homepage": "https://github.com/1wes/medhub-backend#readme",
+  "devDependencies": {
+    "@types/express": "^5.0.5",
+    "@types/node": "^24.10.1",
+    "express": "^5.1.0",
+    "nodemon": "^3.1.11",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
