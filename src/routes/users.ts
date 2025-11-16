@@ -72,7 +72,7 @@ router.post("/login", async (req: Request, res: Response) => {
 
     const token = generateToken(
       user.first_name,
-      user.lasst_name,
+      user.last_name,
       user.email,
       user.uuid
     );
