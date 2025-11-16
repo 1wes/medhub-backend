@@ -27,6 +27,54 @@ router.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
+/**
+ * @swagger
+ * /api/patients/new-patient:
+ *   post:
+ *     summary: Register a new patient
+ *     tags:
+ *       - Patients
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - idNumber
+ *               - date_of_birth
+ *               - gender
+ *               - contact
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Alice Johnson
+ *               idNumber:
+ *                 type: string
+ *                 example: "12345678"
+ *               date_of_birth:
+ *                 type: string
+ *                 format: date
+ *                 example: "1990-05-21"
+ *               gender:
+ *                 type: string
+ *                 example: Female
+ *               contact:
+ *                 type: string
+ *                 example: "+254712345678"
+ *     responses:
+ *       201:
+ *         description: Patient registered successfully
+ *       400:
+ *         description: Missing required fields
+ *       409:
+ *         description: Duplicate entry
+ *       500:
+ *         description: Internal server error
+ */
 router.post(
   "/new-patient",
   verifyToken,
@@ -72,6 +120,92 @@ router.post(
   }
 );
 
+/**
+ * @swagger
+ * /api/patients/:
+ *   get:
+ *     summary: Get a paginated list of all patients for the authenticated user
+ *     tags:
+ *       - Patients
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of items per page
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *           default: ""
+ *         description: Search by patient name or ID number
+ *     responses:
+ *       200:
+ *         description: Paginated list of patients
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       key:
+ *                         type: integer
+ *                         example: 1
+ *                       id:
+ *                         type: integer
+ *                         example: 1
+ *                       uuid:
+ *                         type: string
+ *                         example: "550e8400-e29b-41d4-a716-446655440000"
+ *                       name:
+ *                         type: string
+ *                         example: "Alice Johnson"
+ *                       idNumber:
+ *                         type: string
+ *                         example: "12345678"
+ *                       gender:
+ *                         type: string
+ *                         example: "Female"
+ *                       contact:
+ *                         type: string
+ *                         example: "+254712345678"
+ *                 total:
+ *                   type: integer
+ *                   example: 42
+ *       400:
+ *         description: Invalid page or limit
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid page or limit"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "We encountered an error. Please retry"
+ */
 router.get("/", verifyToken, async (req: Request, res: Response) => {
   try {
     const page = Number(req.query.page) || 1;
@@ -122,6 +256,30 @@ router.get("/", verifyToken, async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/patients/{uuid}:
+ *   get:
+ *     summary: Get a patient and their visit history
+ *     security:
+ *       - cookieAuth: []
+ *     tags:
+ *       - Patients
+ *     parameters:
+ *       - in: path
+ *         name: uuid
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The UUID of the patient
+ *     responses:
+ *       200:
+ *         description: Patient record with visits
+ *       404:
+ *         description: Patient not found
+ *       500:
+ *         description: Server error
+ */
 router.get("/:uuid", verifyToken, async (req: Request, res: Response) => {
   const { uuid } = req.params;
   const { tokenInfo } = req;
@@ -187,6 +345,55 @@ router.get("/:uuid", verifyToken, async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/patients/{uuid}:
+ *   put:
+ *     summary: Update patient details
+ *     security:
+ *       - cookieAuth: []
+ *     tags:
+ *       - Patients
+ *     parameters:
+ *       - in: path
+ *         name: uuid
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: UUID of the patient to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               gender:
+ *                 type: string
+ *               date_of_birth:
+ *                 type: string
+ *                 format: date
+ *               contact:
+ *                 type: string
+ *               idNumber:
+ *                 type: string
+ *             required:
+ *               - name
+ *               - gender
+ *               - date_of_birth
+ *     responses:
+ *       200:
+ *         description: Patient details updated successfully
+ *       400:
+ *         description: Missing required fields
+ *       404:
+ *         description: Patient not found
+ *       500:
+ *         description: Server error
+ */
+
 router.put("/:uuid", verifyToken, async (req: Request, res: Response) => {
   const { uuid } = req.params;
   const { tokenInfo } = req;
@@ -242,6 +449,31 @@ router.put("/:uuid", verifyToken, async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/patients/{uuid}:
+ *   delete:
+ *     summary: Delete a patient
+ *     security:
+ *       - cookieAuth: []
+ *     tags:
+ *       - Patients
+ *     parameters:
+ *       - in: path
+ *         name: uuid
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: UUID of the patient to delete
+ *     responses:
+ *       200:
+ *         description: Patient deleted successfully
+ *       404:
+ *         description: Patient not found
+ *       500:
+ *         description: Server error
+ */
+
 router.delete("/:uuid", verifyToken, async (req: Request, res: Response) => {
   const { uuid } = req.params;
   const { tokenInfo } = req;
@@ -269,6 +501,57 @@ router.delete("/:uuid", verifyToken, async (req: Request, res: Response) => {
       .json({ message: "We encountered an error. Please try again" });
   }
 });
+
+/**
+ * @swagger
+ * /api/patients/{uuid}/visits:
+ *   post:
+ *     summary: Add a new visit for a patient
+ *     tags:
+ *       - Patients
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: uuid
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: UUID of the patient
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - date
+ *               - diagnosis
+ *               - prescribed_medications
+ *             properties:
+ *               date:
+ *                 type: string
+ *                 format: date
+ *                 example: "2025-01-20"
+ *               diagnosis:
+ *                 type: string
+ *                 example: "Malaria"
+ *               prescribed_medications:
+ *                 type: string
+ *                 example: "Artemether, Lumefantrine"
+ *               notes:
+ *                 type: string
+ *                 example: "Patient advised to return if symptoms persist"
+ *     responses:
+ *       201:
+ *         description: Visit added successfully
+ *       400:
+ *         description: Missing required fields
+ *       404:
+ *         description: Patient not found
+ *       500:
+ *         description: Server error
+ */
 
 router.post(
   "/:uuid/visits",

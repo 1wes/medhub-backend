@@ -5,6 +5,80 @@ import { RowDataPacket } from "mysql2";
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /api/dashboards:
+ *   get:
+ *     summary: Get dashboard statistics
+ *     tags:
+ *       - Dashboard
+ *     security:
+ *       - cookieAuth: []
+ *
+ *     responses:
+ *       200:
+ *         description: Dashboard data retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalPatients:
+ *                   type: integer
+ *                   example: 42
+ *                 totalVisits:
+ *                   type: integer
+ *                   example: 128
+ *                 recentVisits:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       visitUuid:
+ *                         type: string
+ *                         example: "b123e440-ff02-45d8-a814-f1c93592b77c"
+ *                       patientUuid:
+ *                         type: string
+ *                         example: "76c3ddae-9c01-48b4-a11b-83d92c1c3129"
+ *                       name:
+ *                         type: string
+ *                         example: "John Doe"
+ *                       visit_date:
+ *                         type: string
+ *                         example: "2024-01-22"
+ *                       diagnosis:
+ *                         type: string
+ *                         example: "Typhoid"
+ *                       prescribed_medications:
+ *                         type: string
+ *                         example: "Ciprofloxacin"
+ *                       notes:
+ *                         type: string
+ *                         nullable: true
+ *                         example: "Follow-up in two weeks"
+ *                 visitsPerWeek:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       week:
+ *                         type: string
+ *                         example: "2024-W05"
+ *                       visits:
+ *                         type: integer
+ *                         example: 12
+ *
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Internal Server Error"
+ */
 router.get("/", verifyToken, async (req: Request, res: Response) => {
   try {
     const { tokenInfo } = req;
@@ -74,7 +148,7 @@ router.get("/", verifyToken, async (req: Request, res: Response) => {
       visitsPerWeek,
     });
   } catch (err) {
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "We encountered an error. Please retry" });
   }
 });
 export default router;
