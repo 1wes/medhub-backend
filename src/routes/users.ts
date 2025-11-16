@@ -14,6 +14,46 @@ router.use((req: Request, res: Response, next: NextFunction) => {
 
 /**
  * @swagger
+ * /api/user/me:
+ *   get:
+ *     summary: Get logged-in user info
+ *     tags:
+ *       - Authentication
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Logged-in user info
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 uuid:
+ *                   type: string
+ *                   example: "b123e440-ff02-45d8-a814-f1c93592b77c"
+ *                 firstName:
+ *                   type: string
+ *                   example: "John"
+ *                 lastName:
+ *                   type: string
+ *                   example: "Doe"
+ *                 email:
+ *                   type: string
+ *                   example: "john@example.com"
+ *       401:
+ *         description: Unauthorized
+ */
+router.get("/me", verifyToken, (req, res) => {
+  const { tokenInfo } = req;
+  res.json({
+    name: tokenInfo.firstName + " " + tokenInfo.lastName,
+    email: tokenInfo.email,
+  });
+});
+
+/**
+ * @swagger
  * /api/user/register:
  *   post:
  *     summary: Register a new user
