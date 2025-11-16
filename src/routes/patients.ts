@@ -58,7 +58,13 @@ router.post(
       ]);
 
       res.status(201).json({ message: "Patient registered." });
-    } catch (error) {
+    } catch (error: any) {
+      if (error.code === "ER_DUP_ENTRY") {
+        return res.status(409).json({
+          message:
+            "User with this email or ID already exists. Retry using a different one",
+        });
+      }
       res.status(500).json({
         message: "We encountered a problem. Please retry",
       });

@@ -5,6 +5,7 @@ import environments from "./env-config";
 import users from "./routes/users";
 import patients from "./routes/patients";
 import visits from "./routes/visits";
+import dashboards from "./routes/dashboard";
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use(cookieParser());
 app.use("/api/user", users);
 app.use("/api/patients", patients);
 app.use("/api/visits", visits);
+app.use("/api/dashboards", dashboards);
 
 app.listen(port, () => {
   console.log(`[server]: running at port ${port}`);
