@@ -8,10 +8,10 @@ if (!tokenSecretKey) {
 }
 
 const generateToken = (
-  email: string,
-  uuid: string,
   firstName: string,
-  lastName: string
+  lastName: string,
+  email: string,
+  uuid: string
 ): string => {
   return jwt.sign(
     { firstName: firstName, lastName: lastName, email: email, uuid: uuid },
